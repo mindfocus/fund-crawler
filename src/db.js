@@ -4,7 +4,7 @@ const GithubDB = require('./githubdb');
 
 exports.write = function (data, filepath) {
     const options = {
-        owner: 'nullpointer',
+        owner: 'mindfocus',
         repo: 'fund-data',
         path: filepath
     };
@@ -21,7 +21,7 @@ exports.write = function (data, filepath) {
 
 exports.read = function (filepath) {
     const options = {
-        owner: 'nullpointer',
+        owner: 'mindfocus',
         repo: 'fund-data',
         path: filepath
     };
