@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.com/nullpointer/fund-crawler.svg?branch=master)](https://travis-ci.com/nullpointer/fund-crawler)
-
+[![Build Status](https://github.com/mindfocus/fund-crawler/workflows/Node.js%20CI/badge.svg)](https://github.com/mindfocus/fund-crawler/actions)
 购买基金可以参考一个法则：
 
 - 最近一年、两年、三年、五年及成立以来收益率排名同类基金的前`1/4`
