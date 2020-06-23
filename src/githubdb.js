@@ -40,7 +40,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 const { Octokit } = require("@octokit/rest");
-let octokit = new Octokit();
+let octokit = '';
 
 /**
  * Creates UUID
@@ -48,8 +48,6 @@ let octokit = new Octokit();
 var UUID = function UUID() {
   return (0, _uuid.v4)().replace(/-/g, '');
 };
-
-var github = '';
 
 /**
  * Returns a UTC timestamped.
@@ -424,7 +422,7 @@ var Githubdb = function () {
     value: function createFile(query, data, options) {
       var _this10 = this;
       return new Promise(function (resolve, reject) {
-        github.repos.createFile({
+        octokit.repos.createOrUpdateFileContents({
           owner: _this10.options.owner,
           repo: _this10.options.repo,
           path: _this10.options.path,
