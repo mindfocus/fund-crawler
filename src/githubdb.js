@@ -40,7 +40,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 const { Octokit } = require("@octokit/rest");
-let octokit = '';
+var octokit = '';
 
 /**
  * Creates UUID
@@ -87,6 +87,7 @@ var getCurrentFile = function getCurrentFile(options) {
       console.log(_chalk.green('√ File located: ' + options.path));
       resolve(res.data);
     }).catch(function (err) {
+      console.log(_chalk.red('×  File not located: ' ));
       reject(err);
     });
   });
@@ -183,7 +184,6 @@ var Githubdb = function () {
       octokit = new Octokit({
         auth: "token",
       });
-
       console.log(_chalk.green('√ User has been authenticated successfully!'));
       return true;
     }
@@ -197,13 +197,16 @@ var Githubdb = function () {
     value: function connectToRepo() {
       var _this2 = this;
 
-      return new Promise(function (resolve) {
+      return new Promise(function (resolve, reject) {
         octokit.repos.get({
           owner: _this2.options.owner,
           repo: _this2.options.repo
         }).then(function (res) {
           console.log(_chalk.green('√ Connected to cloud file database.'));
           resolve(res.data);
+        }).catch(function (err) {
+          console.log(_chalk.red('× Cann\'t connected to cloud file database.' + err));
+          reject(err)
         });
       });
     }
