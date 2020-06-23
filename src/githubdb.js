@@ -40,7 +40,8 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 const { Octokit } = require("@octokit/rest");
-var octokit = '';
+
+var octokit = new Octokit();
 
 /**
  * Creates UUID
@@ -182,9 +183,10 @@ var Githubdb = function () {
         return false;
       }
       octokit = new Octokit({
-        auth: "token",
+        auth: token,
+        userAgent: 'myApp v1.2.3',
       });
-      console.log(_chalk.green('√ User has been authenticated successfully!'));
+      // console.log(_chalk.green('√ User has been authenticated successfully!'));
       return true;
     }
 
@@ -421,8 +423,25 @@ var Githubdb = function () {
       });
     }
   }, {
-    key: 'createFile',
-    value: function createFile(query, data, options) {
+    key: 'getCurrentFile',
+    value: function getCurrentFile(options) {
+      return new Promise(function (resolve, reject) {
+        octokit.repos.getContent({
+          owner: options.owner,
+          repo: options.repo,
+          path: options.path
+        }).then(function (res) {
+          console.log(_chalk.green('√ File located: ' + options.path));
+          resolve(res.data);
+        }).catch(function (err) {
+          console.log(_chalk.red('×  File not located: ' ));
+          reject(err);
+        });
+      });
+    }
+  },{
+    key: 'createOrUpdateFile',
+    value: function createOrUpdateFile(data, options) {
       var _this10 = this;
       return new Promise(function (resolve, reject) {
         octokit.repos.createOrUpdateFileContents({
@@ -431,13 +450,11 @@ var Githubdb = function () {
           path: _this10.options.path,
           message: 'Create ' + _this10.options.path,
           content: 'W10=' // base64 encode of empty array
-        }, (err, result) => {
-          if (err) {
-            reject(err);
-          } else {
-            console.log(_chalk.green('√ New file created: ' + _this10.options.path));
-            resolve(result);
-          }
+        }).then(function (res) {
+          console.log(_chalk.green('√ New file created: ' + _this10.options.path));
+          resolve(result);
+        }).catch(function (err) {
+          reject(err);
         });
       });
     }

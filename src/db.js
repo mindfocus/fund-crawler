@@ -12,10 +12,10 @@ exports.write = function (data, filepath) {
     const githubDB = new GithubDB(options);
     githubDB.auth(getToken());
     githubDB.connectToRepo();
-    githubDB.createFile().then(function () {
-        return githubDB.save(data);
-    }).catch(function () {
-        return githubDB.save(data, true);
+    githubDB.getCurrentFile(options).then(function (res) {
+        return githubDB.createOrUpdateFile(data, res);
+    }).catch(function (err) {
+        return githubDB.createOrUpdateFile(data, err);
     });
 }
 
