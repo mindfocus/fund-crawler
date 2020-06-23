@@ -16,11 +16,11 @@ const c = new Crawler({
             console.error(error);
         } else {
             const funds = FundParser.parseRank(res.body);
-            const filepath = DateFormat(new Date(), 'yyyy/mm/dd') + '/' + res.options['type'] + '.json';
+            const filepath = DateFormat(new Date(new Date()-1), 'yyyy/mm/dd') + '/' + res.options['type'] + '.json';
             DB.write(funds, filepath);
 
             const recommendFunds = Analyzer.analyze(funds);
-            const recommendPath = DateFormat(new Date(), 'yyyy/mm/dd') + '/' + res.options['type'] + '.recommend.json';
+            const recommendPath = DateFormat(new Date(new Date()-1), 'yyyy/mm/dd') + '/' + res.options['type'] + '.recommend.json';
             DB.write(recommendFunds, recommendPath);
 
             if (res.options['type'] === 'all') {
@@ -49,7 +49,8 @@ function writeAllFundCodes(funds) {
 }
 
 exports.start = function start() {
-    const rankUri = 'http://fund.eastmoney.com/data/rankhandler.aspx?op=ph&dt=kf&ft=%s&rs=&gs=0&sc=zzf&st=desc&pi=1&pn=10000&dx=1'
+    var date =DateFormat(new Date(new Date()-1), 'yyyy-mm-dd');
+    const rankUri = 'http://fund.eastmoney.com/data/rankhandler.aspx?op=ph&dt=kf&ft=%s&rs=&gs=0&sc=zzf&st=desc&pi=1&pn=10000&dx=1&sd=' + date + '&ed=' + date;
 
     c.queue({ uri: Util.format(rankUri, 'all'), type: 'all' }); // 全部
     c.queue({ uri: Util.format(rankUri, 'gp'), type: 'gupiao' }); // 股票型
