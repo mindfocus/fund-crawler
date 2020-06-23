@@ -32,15 +32,15 @@ var _util = require('./util');
 
 var util = _interopRequireWildcard(_util);
 
-var _github = require('github');
-
-var _github2 = _interopRequireDefault(_github);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+const { Octokit } = require("@octokit/rest");
+let octokit = new Octokit();
 
 /**
  * Creates UUID
@@ -81,12 +81,12 @@ var encode = function encode(file) {
  */
 var getCurrentFile = function getCurrentFile(options) {
   return new Promise(function (resolve, reject) {
-    github.repos.getContent({
+    octokit.repos.getContent({
       owner: options.owner,
       repo: options.repo,
       path: options.path
     }).then(function (res) {
-      console.log((0, _chalk.green)('√ File located: ' + options.path));
+      console.log(_chalk.green('√ File located: ' + options.path));
       resolve(res.data);
     }).catch(function (err) {
       reject(err);
@@ -112,18 +112,18 @@ var Githubdb = function () {
     /**
      * Initialize connectivity with Github
      */
-    github = new _github2.default({
-      // optional
-      debug: false,
-      protocol: options.protocol || 'https',
-      host: options.host || 'api.github.com', // should be api.github.com for GitHub
-      pathPrefix: options.pathPrefix || null, // for some GHEs; none for GitHub
-      headers: {
-        'user-agent': 'Github DB' // GitHub is happy with a unique user agent
-      },
-      Promise: require('bluebird'),
-      timeout: 5000
-    });
+    // github = new _github2.default({
+    //   // optional
+    //   debug: false,
+    //   protocol: options.protocol || 'https',
+    //   host: options.host || 'api.github.com', // should be api.github.com for GitHub
+    //   pathPrefix: options.pathPrefix || null, // for some GHEs; none for GitHub
+    //   headers: {
+    //     'user-agent': 'Github DB' // GitHub is happy with a unique user agent
+    //   },
+    //   Promise: require('bluebird'),
+    //   timeout: 5000
+    // });
   }
 
   /**
@@ -138,7 +138,7 @@ var Githubdb = function () {
       try {
         return JSON.parse(content);
       } catch (err) {
-        console.log((0, _chalk.red)('× Not a valid object'));
+        console.log(_chalk.red('× Not a valid object'));
       }
       return [];
     }
@@ -153,9 +153,8 @@ var Githubdb = function () {
     key: '_update',
     value: function _update(collection, sha) {
       var _this = this;
-
       return new Promise(function (resolve) {
-        github.repos.updateFile({
+        octokit.repos.createOrUpdateFileContents({
           owner: _this.options.owner,
           repo: _this.options.repo,
           path: _this.options.path,
@@ -163,12 +162,12 @@ var Githubdb = function () {
           content: encode(collection),
           sha: sha
         }).then(function (res) {
-          console.log((0, _chalk.green)('√ File updated: ' + _this.options.path));
+          console.log(_chalk.green('√ File updated: ' + _this.options.path));
           resolve(res.data);
         }).catch(function (err) {
-          console.error((0, _chalk.red)('× Faid to update file: ' + _this.options.path));
+          console.error(_chalk.red('× Faid to update file: ' + _this.options.path));
           console.error(err.message);
-        });
+        })
       });
     }
     /**
@@ -180,14 +179,14 @@ var Githubdb = function () {
     key: 'auth',
     value: function auth(token) {
       if (!token) {
-        console.log((0, _chalk.red)('\n × Missing Personal access token!'));
+        console.log(_chalk.red('\n × Missing Personal access token!'));
         return false;
       }
-      github.authenticate({
-        type: 'token',
-        token: token
+      octokit = new Octokit({
+        auth: "token",
       });
-      console.log((0, _chalk.green)('√ User has been authenticated successfully!'));
+
+      console.log(_chalk.green('√ User has been authenticated successfully!'));
       return true;
     }
 
@@ -201,11 +200,11 @@ var Githubdb = function () {
       var _this2 = this;
 
       return new Promise(function (resolve) {
-        github.repos.get({
+        octokit.repos.get({
           owner: _this2.options.owner,
           repo: _this2.options.repo
         }).then(function (res) {
-          console.log((0, _chalk.green)('√ Connected to cloud file database.'));
+          console.log(_chalk.green('√ Connected to cloud file database.'));
           resolve(res.data);
         });
       });
@@ -245,7 +244,7 @@ var Githubdb = function () {
           });
         }
       }).catch(function (err) {
-        console.error((0, _chalk.red)('× Failed to get file content: ' + _this3.options.path));
+        console.error(_chalk.red('× Failed to get file content: ' + _this3.options.path));
         console.error(err.message);
       });
     }
@@ -359,7 +358,7 @@ var Githubdb = function () {
 
       return getCurrentFile(this.options).then(function (res) {
         return new Promise(function (resolve, reject) {
-          github.repos.deleteFile({
+          octokit.repos.deleteFile({
             owner: _this8.options.owner,
             repo: _this8.options.repo,
             path: _this8.options.path,
@@ -368,7 +367,7 @@ var Githubdb = function () {
           }).then(function () {
             resolve(true);
           }).catch(function (err) {
-            console.log((0, _chalk.red)(err));
+            console.log(_chalk.red(err));
             reject(false);
           });
         });
@@ -435,7 +434,7 @@ var Githubdb = function () {
           if (err) {
             reject(err);
           } else {
-            console.log((0, _chalk.green)('√ New file created: ' + _this10.options.path));
+            console.log(_chalk.green('√ New file created: ' + _this10.options.path));
             resolve(result);
           }
         });
