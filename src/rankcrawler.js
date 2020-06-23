@@ -6,7 +6,7 @@ const FundParser = require('./fundparser');
 const DateFormat = require('dateformat');
 const Util = require('util');
 const Analyzer = require('./fundanalyzer');
-
+const chalk = require('chalk');
 const c = new Crawler({
     // maxConnections : 10,
     referer: "http://fund.eastmoney.com",
@@ -50,7 +50,7 @@ function writeAllFundCodes(funds) {
 
 exports.start = function start() {
     var date =DateFormat(new Date(new Date()-1), 'yyyy-mm-dd');
-    console.log(_chalk.green('√ Date: ' + date));
+    console.log(chalk.green('√ Date: ' + date));
     const rankUri = 'http://fund.eastmoney.com/data/rankhandler.aspx?op=ph&dt=kf&ft=%s&rs=&gs=0&sc=zzf&st=desc&pi=1&pn=10000&dx=1&sd=' + date + '&ed=' + date;
 
     c.queue({ uri: Util.format(rankUri, 'all'), type: 'all' }); // 全部
